@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TPGIT AI ChatBot</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#e6f0ff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh
+}
+.app-container{
+  width:100%;
+  max-width:500px;
+  height:95vh;
+  background:white;
+  border-radius:15px;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 20px rgba(0,0,0,.2)
+}
+.header{
+  background:#202123;
+  color:white;
+  padding:15px;
+  text-align:center;
+  font-weight:bold
+}
+.chat-area{
+  flex:1;
+  padding:15px;
+  overflow-y:auto;
+  background:#f7f7f8
+}
+.message{
+  display:flex;
+  margin-bottom:15px
+}
+.user-message{
+  flex-direction:row-reverse
+}
+.avatar{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:white;
+  font-size:12px;
+  margin:0 8px
+}
+.user-avatar{background:#19c37d}
+.ai-avatar{background:#0d8c6c}
+.text-bubble{
+  max-width:75%;
+  padding:12px;
+  border-radius:15px;
+  font-size:14px
+}
+.user-bubble{
+  background:#19c37d;
+  color:white;
+  border-bottom-right-radius:5px
+}
+.ai-bubble{
+  background:white;
+  border:1px solid #ddd;
+  border-bottom-left-radius:5px
+}
+.input-container{
+  padding:12px;
+  display:flex;
+  gap:10px;
+  border-top:1px solid #ddd
+}
+#messageInput{
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:2px solid #ddd
+}
+#sendButton{
+  width:45px;
+  height:45px;
+  border:none;
+  border-radius:50%;
+  background:#19c37d;
+  color:white;
+  font-size:18px
+}
+#voiceBtn{
+  width:45px;
+  height:45px;
+  border:none;
+  border-radius:50%;
+  background:#555;
+  color:white;
+  font-size:18px
+}
+</style>
+</head>
+
+<body>
+<div class="app-container">
+  <div class="header">🤖 TPGIT AI ChatBot</div>
+  <div class="chat-area" id="chat"></div>
+
+  <div class="input-container">
+    <input id="messageInput" placeholder="Ask something...">
+    <button id="voiceBtn" onclick="toggleVoice()">🔊</button>
+    <button id="sendButton">➤</button>
+  </div>
+</div>
+
+<script>
+let voiceEnabled = true;   // 🔊 Voice default ON
+
+const chat=document.getElementById("chat");
+const input=document.getElementById("messageInput");
+const btn=document.getElementById("sendButton");
+
+function add(role,text){
+  const msg=document.createElement("div");
+  msg.className="message "+(role==="user"?"user-message":"");
+  msg.innerHTML=`
+    <div class="avatar ${role==="user"?"user-avatar":"ai-avatar"}">${role==="user"?"U":"AI"}</div>
+    <div class="text-bubble ${role==="user"?"user-bubble":"ai-bubble"}">${text}</div>`;
+  chat.appendChild(msg);
+  chat.scrollTop=chat.scrollHeight;
+}
+
+btn.onclick=send;
+input.onkeypress=e=>{if(e.key==="Enter")send();};
+
+function send(){
+  const q=input.value.toLowerCase().trim();
+  if(!q) return;
+  add("user",q);
+  input.value="";
+  setTimeout(()=>{
+    const ans = getAnswer(q);
+    add("ai",ans);
+    speak(ans);           // 🔊 voice added
+  },400);
+}
+
+/* 🔊 Voice function */
+function speak(text){
+  if(!voiceEnabled) return;
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = "en-IN";
+  window.speechSynthesis.speak(speech);
+}
+
+/* 🔊 Toggle voice ON/OFF */
+function toggleVoice(){
+  voiceEnabled = !voiceEnabled;
+  document.getElementById("voiceBtn").innerText =
+    voiceEnabled ? "🔊" : "🔇";
+}
+
+function getAnswer(q){
+
+/* Greetings */
+if(q.match(/hi|hello|hey/))
+  return "Hello Welcome to TPGIT AI ChatBot. How can I help you?";
+
+if(q.match(/good morning/))
+  return "Good morning. How can I assist you today?";
+
+if(q.match(/good afternoon/))
+  return "Good afternoon. Feel free to ask your questions.";
+
+if(q.match(/good evening/))
+  return "Good evening. How can I help you?";
+
+if(q.match(/thank you|thanks/))
+  return "You're welcome. Happy to help.";
+
+/* College Information */
+if(q.match(/tpgit|about/))
+  return "Thanthai Periyar Government Institute of Technology is a government engineering college.";
+
+if(q.match(/establish|year/))
+  return "TPGIT was established in the year 1990.";
+
+if(q.match(/location|where/))
+  return "TPGIT is located at Bagayam, Vellore.";
+
+if(q.match(/address/))
+  return "TPGIT, Bagayam, Vellore – 632002.";
+
+if(q.match(/affiliated/))
+  return "TPGIT is affiliated to Anna University, Chennai.";
+
+if(q.match(/govern|directorate/))
+  return "TPGIT is under Directorate of Technical Education, Tamil Nadu.";
+
+/* Working Time */
+if(q.match(/working|time|hours/))
+  return "College working hours are 9 AM to 5 PM, Monday to Friday.";
+
+/* Admission */
+if(q.match(/admission|join/))
+  return "Admissions are done through Anna University counselling.";
+
+if(q.match(/eligibility/))
+  return "Candidates must pass 12th with Maths, Physics and Chemistry.";
+
+if(q.match(/application|apply/))
+  return "Application is through online counselling only.";
+
+if(q.match(/reservation|7.5/))
+  return "7.5 percent reservation students do not have to pay college fees.";
+
+/* Courses */
+if(q.match(/ug|undergraduate|courses/))
+  return "UG courses include B.E. CSE, ECE, EEE, Mechanical, Civil and Robotics.";
+
+if(q.match(/pg|postgraduate/))
+  return "PG courses include M.E. Applied Electronics, Manufacturing and Structural.";
+
+if(q.match(/mca/))
+  return "MCA course is available.";
+
+if(q.match(/part/))
+  return "Part-time engineering courses are available.";
+
+if(q.match(/robot/))
+  return "Robotics engineering course is available at UG level.";
+
+/* College Fees */
+if(q.match(/college fees/))
+  return "College Fees are 1st Year Rs.10,300, 2nd Year Rs.6,480, 3rd and 4th Year Rs.4,480.";
+
+/* Mess */
+if(q.match(/mess/))
+  return "Mess fees are approximately Rs.2,500 per month.";
+
+/* Hostel */
+if(q.match(/hostel fees/))
+  return "Hostel fee is Rs.14,000 for first year including refundable amount. From second year Rs.9,550 per year.";
+
+if(q.match(/hostel/))
+  return "Hostel facility is available for both boys and girls.";
+
+/* Facilities */
+if(q.match(/library/))
+  return "Library is open from 9 AM to 5 PM on working days.";
+
+if(q.match(/lab/))
+  return "Well equipped laboratories are available.";
+
+if(q.match(/wifi/))
+  return "Campus has WiFi facility.";
+
+/* Support */
+if(q.match(/schemes/))
+  return "All government scholarships are available for eligible students.";
+
+if(q.match(/medical/))
+  return "Basic medical and first aid facilities are available.";
+
+/* Contact */
+if(q.match(/contact|phone|help/))
+  return "Help desk assistance is available during working hours. Contact number is 0416-2267762.";
+
+return "Sorry, I couldn't understand. Please ask about admission, courses, fees, hostel or placement.";
+}
+</script>
+</body>
+</html>
